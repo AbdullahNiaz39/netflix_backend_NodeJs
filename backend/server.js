@@ -18,6 +18,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/api", goalRouter);
 app.use("/api/users", userRouter);
 
-app.use(errorHandler);
+//app.use(errorHandler);
 
 app.listen(port, () => console.log(`Server run on port ${port}`));
