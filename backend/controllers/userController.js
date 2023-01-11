@@ -26,7 +26,12 @@ const registorUser = asyncHandle(async (req, res) => {
     email,
     password: hashPassword,
   });
-  res.status(201).json({ status: "Registation Success", user });
+  res.status(201).json({
+    status: "Registation Success",
+    name: user.name,
+    email: user.email,
+    token: generateToken(user._id),
+  });
 });
 
 //Method Post

@@ -4,8 +4,9 @@ const dotenv = require("dotenv").config();
 const goalRouter = require("./routes/goalRoutes");
 const userRouter = require("./routes/userRoutes");
 const connect = require("./config/db");
+const cors = require("cors");
 
-const port = process.env.PORT || 5000;
+const port = 5000;
 
 connect();
 
@@ -14,7 +15,7 @@ const app = express();
 ///To parse raw data
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
+app.use(cors());
 app.use("/api", goalRouter);
 app.use("/api/users", userRouter);
 
