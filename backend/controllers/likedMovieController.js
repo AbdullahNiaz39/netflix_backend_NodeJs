@@ -9,7 +9,7 @@ const addToLikedMovies = asyncHandle(async (req, res) => {
   try {
     const { data } = req.body;
     const id = req.user.id;
-    const user = await LikedMovie.findOne({ user: id });
+    const user = await LikedMovie.findOne({ user: id }).select("likedMovies");
 
     if (user) {
       const { likedMovies } = user;
@@ -18,7 +18,6 @@ const addToLikedMovies = asyncHandle(async (req, res) => {
       );
 
       if (!movieAlreadyLiked) {
-        console.log(movieAlreadyLiked);
         await LikedMovie.findByIdAndUpdate(user._id, {
           $push: { likedMovies: data },
         });
@@ -41,6 +40,91 @@ const addToLikedMovies = asyncHandle(async (req, res) => {
   }
 });
 
+///get Liked Movies//
+const getLikedMovies = asyncHandle(async (req, res) => {
+  try {
+    const id = req.user.id;
+    const user = await LikedMovie.findOne({ user: id }).select("likedMovies");
+    if (user) {
+      res.status(200).json({
+        status: "Movies Shows SuccessFully",
+        movies: user.likedMovies,
+      });
+    } else {
+      res.status(400).json({ message: "Error fetching Movies" });
+    }
+  } catch (err) {
+    res.status(400);
+    throw new Error("Error Adding Movies");
+  }
+});
+
+///Remove Liked Movies//
+// const removeLikedMovies = asyncHandle(async (req, res) => {
+//   try {
+//     const { movieId } = req.body;
+//     const id = req.user.id;
+//     const user = await LikedMovie.findOne({ user: id }).select("likedMovies");
+
+//     if (user) {
+//       const movies = user.likedMovies;
+//       const movieIndex = movies.findIndex((movie) => movie.id === movieId);
+//       console.log(movieIndex);
+//       if (!movieIndex) res.status(400).send({ message: "Movie not Found" });
+//       movies.splice(movieIndex, 1);
+
+//       await LikedMovie.findByIdAndUpdate(
+//         user._id,
+//         {
+//           $push: { movies },
+//         },
+//         { new: true }
+//       );
+//       res.status(200).json({ message: "Movies Remove SuccessFully", movies });
+//     } else {
+//       res.status(400).json({ message: "User with given email not found." });
+//     }
+//   } catch (err) {
+//     res.status(400);
+//     throw new Error("Error Deleting Movies");
+//   }
+// });
+
+const removeLikedMovies = asyncHandle(async (req, res) => {
+  try {
+    const { movieId } = req.body;
+    const id = req.user.id;
+    const user = await LikedMovie.findOne({ user: id }).select("likedMovies");
+
+    if (user) {
+      const movies = user.likedMovies;
+      const movieIndex = movies.findIndex((movie) => movie.id === movieId);
+
+      if (movieIndex === -1) {
+        res.status(400).json({ message: "Movie not Found" });
+        return;
+      }
+      movies.splice(movieIndex, 1);
+
+      await LikedMovie.findByIdAndUpdate(
+        user._id,
+        {
+          $set: { likedMovies: movies },
+        },
+        { new: true }
+      );
+      res.status(200).json({ message: "Movies Remove SuccessFully", movies });
+    } else {
+      res.status(400).json({ message: "User with given email not found." });
+    }
+  } catch (err) {
+    res.status(400);
+    throw new Error("Error Deleting Movies");
+  }
+});
+
 module.exports = {
   addToLikedMovies,
+  getLikedMovies,
+  removeLikedMovies,
 };

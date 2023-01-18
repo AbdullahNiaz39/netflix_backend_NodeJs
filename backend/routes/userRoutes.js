@@ -6,7 +6,11 @@ const {
   getMe,
   getUser,
 } = require("../controllers/userController");
-const { addToLikedMovies } = require("../controllers/likedMovieController");
+const {
+  addToLikedMovies,
+  getLikedMovies,
+  removeLikedMovies,
+} = require("../controllers/likedMovieController");
 
 //MiddleWare For authorization
 const { protectUser } = require("../middleware/authMiddleware");
@@ -17,5 +21,7 @@ router.post("/login", loginUser);
 router.get("/me", protectUser, getMe);
 router.get("/", getUser);
 router.post("/liked", protectUser, addToLikedMovies);
+router.get("/liked", protectUser, getLikedMovies);
+router.put("/liked", protectUser, removeLikedMovies);
 
 module.exports = router;
