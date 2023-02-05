@@ -19,6 +19,9 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
+app.use("/", (req, res) => {
+  res.send({ title: "Ali" });
+});
 app.use("/api/reviews", reviewRouter);
 app.use("/api/users", userRouter);
 app.use("/api/comments", commentRouter);
