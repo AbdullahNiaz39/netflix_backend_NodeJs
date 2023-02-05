@@ -1,15 +1,17 @@
 const mongoose = require("mongoose");
 
-const goalSchema = mongoose.Schema(
+const reviewSchema = mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
       require: true,
       ref: "User",
     },
-    text: {
-      type: String,
+    rating: {
+      type: Number,
       required: [true, "Please add text a value"],
+      min: [1, "No less then One"],
+      max: [9, "No more then 9"],
     },
   },
   {
@@ -17,4 +19,4 @@ const goalSchema = mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Goal", goalSchema);
+module.exports = mongoose.model("Review", reviewSchema);

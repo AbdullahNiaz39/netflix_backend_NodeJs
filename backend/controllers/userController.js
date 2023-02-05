@@ -3,6 +3,7 @@ require("colors");
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const Comment = require("../models/commentModel");
 const User = require("../models/userModel");
 
 //Registation
@@ -21,11 +22,11 @@ const registorUser = asyncHandle(async (req, res) => {
     throw new Error("Email Already Exists");
   }
   //password Hide
-  const hashPassword = await bcrypt.hash(password, 10);
+  // const hashPassword = await bcrypt.hash(password, 10);
   const user = await User.create({
     name,
     email,
-    password: hashPassword,
+    password,
   });
   res.status(201).json({
     status: "Registation Success",
@@ -74,6 +75,45 @@ const getUser = asyncHandle(async (req, res) => {
   res.status(200).json({ status: "Success", user });
 });
 
+//Delete user
+//Method Get
+//Only Delete by admin
+const deleteUser = asyncHandle(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  //check for user
+  if (!user) {
+    res.status(401);
+    throw new Error("user not Found");
+  }
+
+  // Delete all comment made by the user
+  const allData = await Comment.deleteMany({ user: req.params.id });
+
+  await user.remove();
+  res
+    .status(200)
+    .json({ message: `Delete User ${req.params.id}`, user, allData });
+});
+
+//Delete user
+//Method Get
+//Only Delete by admin
+const updateUser = asyncHandle(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  //check for user
+  if (!user) {
+    res.status(401);
+    throw new Error("user not Found");
+  }
+
+  const editUser = await User.findByIdAndUpdate(
+    req.params.id,
+    { ...req.body },
+    { new: true }
+  );
+  res.status(200).json({ status: "Success", user: editUser });
+});
+
 //Generate JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -86,5 +126,7 @@ module.exports = {
   loginUser,
   getMe,
   getUser,
+  deleteUser,
+  updateUser,
   // addToLikedMovies,
 };
